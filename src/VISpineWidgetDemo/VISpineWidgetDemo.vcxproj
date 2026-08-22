@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{D5C9E4B2-7A1F-4D36-9B8E-2F0A6C1D3E54}</ProjectGuid>
+    <Keyword>QtVS_v304</Keyword>
+    <RootNamespace>VISpineWidgetDemo</RootNamespace>
+    <ProjectName>VISpineWidgetDemo</ProjectName>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <!-- 固定 Qt 版本: 本机注册表默认 Qt 版本是 6.8.3, 若不显式指定, 未传 /p:QtInstall 的构建
+         (如 VS IDE 构建) 会回退到 6.8.3 的 moc, 与 6.10.3 的 obj 缓存冲突报 C1189。
+         显式固定后任何构建方式都统一用 6.10.3, moc 缓存不会再混版本。 -->
+    <QtInstall>D:\Qt\6.10.3\msvc2022_64</QtInstall>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)x64\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <QmlDeployDir>$([System.IO.Path]::GetFullPath('$(ProjectDir)').TrimEnd('\'))</QmlDeployDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)x64\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <QmlDeployDir>$([System.IO.Path]::GetFullPath('$(ProjectDir)').TrimEnd('\'))</QmlDeployDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>QT_NO_DEPRECATED_WARNINGS;_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <!-- PIMPL 后公共头不依赖 spine, 使用方无需 spine-cpp/include -->
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\VISpineWidget\Widgets;$(QtInstallDir)\include;$(QtInstallDir)\include\QtCore;$(QtInstallDir)\include\QtGui;$(QtInstallDir)\include\QtWidgets;$(QtInstallDir)\include\QtOpenGL;$(QtInstallDir)\include\QtOpenGLWidgets;$(QtInstallDir)\include\QtGui\6.10.3\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)x64\$(Configuration);$(QtInstallDir)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <!-- spine 符号已封装在 Visindigo-Widgets-SpineWidget.dll 内, demo 只链接 Visindigo-Widgets-SpineWidget 导入库, 不再直接链 spine-cpp.lib -->
+      <AdditionalDependencies>Visindigo-Widgets-SpineWidget.lib;Qt6Cored.lib;Qt6Guid.lib;Qt6Widgetsd.lib;Qt6OpenGLd.lib;Qt6OpenGLWidgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>QT_NO_DEPRECATED_WARNINGS;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\VISpineWidget\Widgets;$(QtInstallDir)\include;$(QtInstallDir)\include\QtCore;$(QtInstallDir)\include\QtGui;$(QtInstallDir)\include\QtWidgets;$(QtInstallDir)\include\QtOpenGL;$(QtInstallDir)\include\QtOpenGLWidgets;$(QtInstallDir)\include\QtGui\6.10.3\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)x64\$(Configuration);$(QtInstallDir)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <!-- spine 符号已封装在 Visindigo-Widgets-SpineWidget.dll 内, demo 只链接 Visindigo-Widgets-SpineWidget 导入库, 不再直接链 spine-cpp.lib -->
+      <AdditionalDependencies>Visindigo-Widgets-SpineWidget.lib;Qt6Core.lib;Qt6Gui.lib;Qt6Widgets.lib;Qt6OpenGL.lib;Qt6OpenGLWidgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="demo.cpp" />
+    <QtMoc Include="main.cpp">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="demo.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtModules Include="core;gui;widgets;opengl;openglwidgets" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="examples\your_spine\your_spine.atlas" />
+    <None Include="examples\your_spine\your_spine.png" />
+    <None Include="examples\your_spine\your_spine.skel" />
+  </ItemGroup>
+  <ItemDefinitionGroup>
+    <PostBuildEvent>
+      <Message>Deploy examples + Qt runtime</Message>
+      <Command>if not exist "$(OutDir)examples" xcopy /E /I /Y "$(ProjectDir)examples" "$(OutDir)examples"
+"$(QtInstallDir)\bin\windeployqt.exe" $(QtDeployConfig) --no-translations --no-system-d3d-compiler --no-opengl-sw --no-compiler-runtime "$(TargetPath)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(QtMsBuild)\qt.targets" Condition="Exists('$(QtMsBuild)\qt.targets')" />
+  </ImportGroup>
+</Project>

@@ -1,0 +1,15 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <BuildType Name="Debug" />
+    <BuildType Name="Release" />
+  </Configurations>
+  <Project Path="src\spine-cpp\spine-cpp.vcxproj" Id="{2459BA2D-60A3-41CA-A0F2-126E153472A9}" Type="VC" DisplayName="spine-cpp" />
+  <Project Path="src\VISpineWidget\VISpineWidget.vcxproj" Id="{7B6E2A31-9C4D-4F58-A1B0-3E8C6D4F5A92}" Type="VC" DisplayName="VISpineWidget">
+    <BuildDependency Project="src\spine-cpp\spine-cpp.vcxproj" />
+  </Project>
+  <Project Path="src\VISpineWidgetDemo\VISpineWidgetDemo.vcxproj" Id="{D5C9E4B2-7A1F-4D36-9B8E-2F0A6C1D3E54}" Type="VC" DisplayName="VISpineWidgetDemo" DefaultStartup="true">
+    <BuildDependency Project="src\spine-cpp\spine-cpp.vcxproj" />
+    <BuildDependency Project="src\VISpineWidget\VISpineWidget.vcxproj" />
+  </Project>
+</Solution>
