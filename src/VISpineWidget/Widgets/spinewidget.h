@@ -10,6 +10,8 @@
 
 #include <QtGlobal>
 class QShowEvent;
+class QWheelEvent;
+class QMouseEvent;
 #ifndef VisindigoAPI
 #  ifdef _MSC_VER
 #    define VisindigoAPI Q_DECL_IMPORT
@@ -63,6 +65,7 @@ signals:
     void debugBonesChanged(bool debugBones);
     void debugSlotsChanged(bool debugSlots);
     void debugMeshChanged(bool debugMesh);
+    void debugStyleChanged();
     void animationsChanged(const QStringList& animations);
     void skinsChanged(const QStringList& skins);
     void skeletonScaleChanged(const qreal& scale);
@@ -73,6 +76,7 @@ signals:
     void defaultMixChanged(const qreal& defaultMix);
     void scaleXChanged(const qreal& scaleX);
     void scaleYChanged(const qreal& scaleY);
+    void anchorOffsetChanged(const QPointF& offset);
     void blendColorChanged(const QColor& color);
     void blendColorChannelChanged(qint32 channel);
     void lightChanged(float light);
@@ -135,6 +139,8 @@ public:
     void setScaleY(const qreal& value);
     QPointF anchorOffset() const;
     void setAnchorOffset(const QPointF& offset);
+    bool isInteractEnable() const;
+    void setInteractEnable(bool enable);
     bool clickThrough() const;
     void setClickThrough(bool clickThrough);
     bool hitTest(const QPoint& widgetPos) const;
@@ -150,6 +156,19 @@ public:
     void setDebugSlots(bool debugSlots);
     bool debugMesh() const;
     void setDebugMesh(bool debugMesh);
+    qreal debugBonesWidth() const;
+    void setDebugBonesWidth(qreal width);
+    qreal debugSlotsWidth() const;
+    void setDebugSlotsWidth(qreal width);
+    qreal debugMeshWidth() const;
+    void setDebugMeshWidth(qreal width);
+    QColor debugBonesColor() const;
+    void setDebugBonesColor(const QColor& color);
+    QColor debugSlotsColor() const;
+    void setDebugSlotsColor(const QColor& color);
+    QColor debugMeshColor() const;
+    void setDebugMeshColor(const QColor& color);
+    void setDebugLineWidth(qreal width);
     QColor backgroundColor() const;
     void setBackgroundColor(const QColor& color);
 
@@ -158,6 +177,10 @@ protected:
     void resizeGL(qint32 w, qint32 h) override;
     void paintGL() override;
     void showEvent(QShowEvent* event) override;
+    void wheelEvent(QWheelEvent* event) override;
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
     bool nativeEvent(const QByteArray& eventType, void* message, qintptr* result) override;
 
 private:

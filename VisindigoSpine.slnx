@@ -1,7 +1,7 @@
 <Solution>
+  <!-- Visindigo 系列仅支持 Release 构建(二进制兼容问题), 不提供 Debug 构建 -->
   <Configurations>
     <Platform Name="x64" />
-    <BuildType Name="Debug" />
     <BuildType Name="Release" />
   </Configurations>
   <Project Path="src\spine-cpp\spine-cpp.vcxproj" Id="{2459BA2D-60A3-41CA-A0F2-126E153472A9}" Type="VC" DisplayName="spine-cpp" />
@@ -10,6 +10,11 @@
   </Project>
   <Project Path="src\VISpineWidgetDemo\VISpineWidgetDemo.vcxproj" Id="{D5C9E4B2-7A1F-4D36-9B8E-2F0A6C1D3E54}" Type="VC" DisplayName="VISpineWidgetDemo" DefaultStartup="true">
     <BuildDependency Project="src\spine-cpp\spine-cpp.vcxproj" />
+    <BuildDependency Project="src\VISpineWidget\VISpineWidget.vcxproj" />
+  </Project>
+  <!-- YSS Spine Viewer 插件(因许可证原因只在本方案维护, 不属于 YSS 方案):
+       include/lib 硬连接 YSS, 输出本方案 x64\Release, 编译后部署到 YSS 插件目录 -->
+  <Project Path="src\Plugin_YSSSpineViewer\Plugin_YSSSpineViewer.vcxproj" Id="{24CF46F2-85FF-4162-BB16-299E3AB51EA5}" Type="VC" DisplayName="Plugin_YSSSpineViewer">
     <BuildDependency Project="src\VISpineWidget\VISpineWidget.vcxproj" />
   </Project>
 </Solution>

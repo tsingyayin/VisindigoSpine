@@ -134,7 +134,10 @@ void AimyTextureLoader::invalidateGlTextures()
     QMutexLocker locker(&mutex);
     for (auto it = textureHash.begin(); it != textureHash.end(); ++it) {
         if (it.value()->glTexture) {
-            delete it.value()->glTexture;
+            // 上下文重建(重 parent/窗口重建)时旧上下文已销毁, 直接 delete 会经悬空
+            // 上下文调用 QOpenGLContext::areSharing 崩溃; 此时仅丢弃指针, 交由懒创建重建。
+            if (it.value()->context)
+                delete it.value()->glTexture;
             it.value()->glTexture = nullptr;
         }
     }

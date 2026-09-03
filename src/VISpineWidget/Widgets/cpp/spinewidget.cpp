@@ -8,11 +8,14 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 #include <QOpenGLFunctions>
+#include <QOpenGLContext>
 #include <QSurfaceFormat>
 #include <QTimerEvent>
 #include <QFile>
 #include <QDebug>
 #include <QCursor>
+#include <QMouseEvent>
+#include <QWheelEvent>
 #include <QMatrix4x4>
 #include <QVector3D>
 #include <QMutex>
@@ -210,6 +213,12 @@ protected:
     bool debugBones = false;
     bool debugSlots = false;
     bool debugMesh = false;
+    qreal debugBonesWidth = 2.0;    // 骨骼调试线宽(默认 2)
+    qreal debugSlotsWidth = 1.0;    // 插槽调试线宽(默认 1)
+    qreal debugMeshWidth = 1.0;     // 网格调试线宽(默认 1)
+    QColor debugBonesColor = QColor(200, 150, 40, 255);   // 与旧渲染颜色保持一致
+    QColor debugSlotsColor = QColor(200, 40, 150, 255);
+    QColor debugMeshColor = QColor(40, 150, 200, 255);
     bool isLoading = false;
     bool hasViewport = false;
     bool animating = false;
@@ -220,6 +229,9 @@ protected:
     qreal scaleX = 1.0;
     qreal scaleY = 1.0;
     QPointF anchorOffset;
+    bool interactEnable = true;   // 鼠标交互开关(滚轮缩放/左键拖动平移)
+    bool dragging = false;        // 是否正在左键拖动
+    QPointF lastDragPos;          // 上次拖动位置(控件坐标)
     bool clickThrough = false;
     qreal timeScale = 1.0;
     qreal skeletonScale = 1.0;
@@ -825,6 +837,8 @@ void SpineWidgetPrivate::ensureGlTexture(Texture* texture)
     texture->glTexture->setMinificationFilter(QOpenGLTexture::Linear);
     texture->glTexture->setMagnificationFilter(QOpenGLTexture::Linear);
     texture->glTexture->setWrapMode(QOpenGLTexture::ClampToEdge);
+    // 记录创建时的上下文, 供销毁时安全判定(见 Texture::~Texture / invalidateGlTextures)
+    texture->context = QOpenGLContext::currentContext();
 }
 
 /*
@@ -1127,8 +1141,8 @@ QMatrix4x4 SpineWidgetPrivate::projectionMatrix() const
     const qreal scale = qMax(vw / contentRect.width(), vh / contentRect.height());
     const qreal viewW = vw / scale;
     const qreal viewH = vh / scale;
-    const qreal ox = qBound<qreal>(-1.0, anchorOffset.x(), 1.0);
-    const qreal oy = qBound<qreal>(-1.0, anchorOffset.y(), 1.0);
+    const qreal ox = anchorOffset.x();   // 不再限制 -1~1(交互拖动/滑块可超出)
+    const qreal oy = anchorOffset.y();
     QMatrix4x4 matrix;
     // 显式 ortho(left, right, bottom, top): 世界 Y 小(脚) -> 投影 bottom -> NDC 底部(-1);
     // 世界 Y 大(头) -> 投影 top -> NDC 顶部(+1)。注意不能用 QMatrix4x4::ortho(QRectF),
@@ -1249,7 +1263,9 @@ void SpineWidgetPrivate::renderBatches()
             // Multiply 的 dst 因子必须是 GL_ONE_MINUS_SRC_ALPHA:
             // 用 GL_ONE_MINUS_SRC_COLOR 时 dst = src*dst + dst*(1-src) = dst, 恒为无操作,
             // 半透明黑面纱(Multiply)会因此完全不可见。
-            case spine::BlendMode_Multiply: gl->glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA); break;
+            // 用 glBlendFuncSeparate: 颜色走 Multiply(dstColor), alpha 走 (ONE, 1-srcA),
+            // 否则透明背景(0,0,0,0)下 alpha 会被乘成 0, 面纱透过透明窗体完全看不见。
+            case spine::BlendMode_Multiply: gl->glBlendFuncSeparate(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA); break;
             case spine::BlendMode_Screen:   gl->glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR); break;
             default:                        gl->glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); break;
             }
@@ -1301,8 +1317,8 @@ void SpineWidgetPrivate::renderDebug()
     gl->glDisable(GL_BLEND);
 
     if (debugSlots) {
-        colorProgram->setUniformValue("u_color", QColor(200, 40, 150, 255));
-        gl->glLineWidth(1);
+        colorProgram->setUniformValue("u_color", debugSlotsColor);
+        gl->glLineWidth(static_cast<GLfloat>(debugSlotsWidth));
         Point points[4];
         for (size_t i = 0, n = skeleton->getSlots().size(); i < n; i++) {
             auto slot = skeleton->getSlots()[i];
@@ -1321,7 +1337,8 @@ void SpineWidgetPrivate::renderDebug()
 
     if (debugMesh) {
         spine::Vector<Point> points;
-        colorProgram->setUniformValue("u_color", QColor(40, 150, 200, 255));
+        colorProgram->setUniformValue("u_color", debugMeshColor);
+        gl->glLineWidth(static_cast<GLfloat>(debugMeshWidth));
         for (size_t i = 0, n = skeleton->getSlots().size(); i < n; i++) {
             auto slot = skeleton->getSlots()[i];
             if (not slot->getAttachment() || not slot->getAttachment()->getRTTI().isExactly(spine::MeshAttachment::rtti))
@@ -1337,8 +1354,8 @@ void SpineWidgetPrivate::renderDebug()
     }
 
     if (debugBones) {
-        colorProgram->setUniformValue("u_color", QColor(200, 150, 40, 255));
-        gl->glLineWidth(2);
+        colorProgram->setUniformValue("u_color", debugBonesColor);
+        gl->glLineWidth(static_cast<GLfloat>(debugBonesWidth));
         for (size_t i = 0, n = skeleton->getBones().size(); i < n; i++) {
             auto bone = skeleton->getBones()[i];
             if (not bone->isActive())
@@ -1921,7 +1938,7 @@ QPointF SpineWidget::preferSize() const
     \since Visindigo 0.16.2
     世界原点 (0,0) 在控件中的偏移(百分比)。
 
-    x/y ∈ [-1,1], 右/下为正: +1=贴右/底边, 0=中心, -1=贴左/顶边。
+    x/y 不再限制在 [-1,1], 右/下为正: +1=贴右/底边, 0=中心, -1=贴左/顶边。
     默认 (0,0) 即原点居中。常用于把角色偏置(例如只显示上半身)。
 
     \sa setAnchorOffset()
@@ -1936,7 +1953,7 @@ QPointF SpineWidget::anchorOffset() const
     \since Visindigo 0.16.2
     设置原点偏移(见 \l anchorOffset 说明)。
 
-    \a offset 百分比偏移 QPointF(x, y); 各分量会被限制在 [-1,1]
+    \a offset 百分比偏移 QPointF(x, y); 已解除 [-1,1] 限制(可被交互拖动/滑块设为任意值)
     \sa anchorOffset()
 
 */
@@ -1945,7 +1962,115 @@ void SpineWidget::setAnchorOffset(const QPointF& offset)
     if (d->anchorOffset == offset)
         return;
     d->anchorOffset = offset;
+    emit anchorOffsetChanged(d->anchorOffset);
     update();
+}
+
+/*!
+    \since Visindigo 0.16.2
+    是否开启鼠标交互(滚轮缩放 / 左键拖动平移), 默认开启。
+
+    \sa setInteractEnable()
+
+*/
+bool SpineWidget::isInteractEnable() const { return d->interactEnable; }
+void SpineWidget::setInteractEnable(bool enable) { d->interactEnable = enable; }
+
+/*!
+    \since Visindigo 0.16.2
+    鼠标滚轮 = 缩放(以当前 skeletonScale 为基准, 上滚 ×1.1 / 下滚 ×0.9, 限 0.1~20)。
+
+*/
+void SpineWidget::wheelEvent(QWheelEvent* event)
+{
+    if (not d->interactEnable || not isSkeletonReady()) {
+        QOpenGLWidget::wheelEvent(event);
+        return;
+    }
+    const int delta = event->angleDelta().y();
+    qreal factor = 1.0;
+    if (delta > 0)
+        factor = 1.1;          // 上滚放大
+    else if (delta < 0)
+        factor = 0.9;          // 下滚缩小
+    else {
+        QOpenGLWidget::wheelEvent(event);
+        return;
+    }
+    const qreal vw = qMax<qreal>(1.0, width());
+    const qreal vh = qMax<qreal>(1.0, height());
+    // 缩放锚点 = 鼠标所在位置: 缩放前记录鼠标下的世界坐标, 缩放后再调整 anchorOffset
+    // 使其回到鼠标处, 避免内容偏向一边。
+    const QPointF pos = event->position();
+    const float ndcX = float(2.0 * pos.x() / vw - 1.0);
+    const float ndcY = float(1.0 - 2.0 * pos.y() / vh);
+    const QVector3D world = d->projectionMatrix().inverted().map(QVector3D(ndcX, ndcY, 0.0f));
+
+    d->skeletonScale = qBound<qreal>(0.1, d->skeletonScale * factor, 20.0);
+    emit skeletonScaleChanged(d->skeletonScale);
+
+    // 缩放后该世界点的屏幕位置与鼠标位置之差, 换算成 anchorOffset 修正量
+    const QVector3D ndcAfter = d->projectionMatrix().map(world);
+    const qreal pxAfter = (ndcAfter.x() + 1.0f) * 0.5f * vw;
+    const qreal pyAfter = (1.0f - ndcAfter.y()) * 0.5f * vh;
+    d->anchorOffset.rx() += 2.0 * (pos.x() - pxAfter) / vw;
+    d->anchorOffset.ry() += 2.0 * (pos.y() - pyAfter) / vh;
+    emit anchorOffsetChanged(d->anchorOffset);
+
+    update();
+    event->accept();
+}
+
+/*!
+    \since Visindigo 0.16.2
+    左键按下: 开始拖动(记录起始位置)。
+
+*/
+void SpineWidget::mousePressEvent(QMouseEvent* event)
+{
+    if (d->interactEnable && event->button() == Qt::LeftButton) {
+        d->dragging = true;
+        d->lastDragPos = event->position();
+        event->accept();
+        return;
+    }
+    QOpenGLWidget::mousePressEvent(event);
+}
+
+/*!
+    \since Visindigo 0.16.2
+    左键拖动: 更新 anchorOffset 实现平移(控件像素 -> 归一化偏移)。
+
+*/
+void SpineWidget::mouseMoveEvent(QMouseEvent* event)
+{
+    if (d->interactEnable && d->dragging) {
+        const QPointF pos = event->position();
+        const QPointF delta = pos - d->lastDragPos;
+        d->lastDragPos = pos;
+        d->anchorOffset.rx() += 2.0 * delta.x() / qMax<qreal>(1.0, width());
+        d->anchorOffset.ry() += 2.0 * delta.y() / qMax<qreal>(1.0, height());
+        emit anchorOffsetChanged(d->anchorOffset);
+        update();
+        event->accept();
+        return;
+    }
+    QOpenGLWidget::mouseMoveEvent(event);
+}
+
+/*!
+    \since Visindigo 0.16.2
+    左键释放: 结束拖动。
+
+*/
+void SpineWidget::mouseReleaseEvent(QMouseEvent* event)
+{
+    if (d->interactEnable && event->button() == Qt::LeftButton) {
+        d->dragging = false;
+        event->accept();
+        return;
+    }
+    QOpenGLWidget::mouseReleaseEvent(event);
 }
 
 /*!
@@ -2419,6 +2544,67 @@ void SpineWidget::setDebugMesh(bool debugMesh)
     emit debugMeshChanged(d->debugMesh);
     update();
 }
+
+/*!
+    \property SpineWidget::debugBonesWidth
+    \since Visindigo 0.16.2
+    骨骼调试线宽(默认 2)。
+*/
+qreal SpineWidget::debugBonesWidth() const { return d->debugBonesWidth; }
+void SpineWidget::setDebugBonesWidth(qreal width) { d->debugBonesWidth = width; emit debugStyleChanged(); update(); }
+
+/*!
+    \property SpineWidget::debugSlotsWidth
+    \since Visindigo 0.16.2
+    插槽调试线宽(默认 1)。
+*/
+qreal SpineWidget::debugSlotsWidth() const { return d->debugSlotsWidth; }
+void SpineWidget::setDebugSlotsWidth(qreal width) { d->debugSlotsWidth = width; emit debugStyleChanged(); update(); }
+
+/*!
+    \property SpineWidget::debugMeshWidth
+    \since Visindigo 0.16.2
+    网格调试线宽(默认 1)。
+*/
+qreal SpineWidget::debugMeshWidth() const { return d->debugMeshWidth; }
+void SpineWidget::setDebugMeshWidth(qreal width) { d->debugMeshWidth = width; emit debugStyleChanged(); update(); }
+
+/*!
+    \since Visindigo 0.16.2
+    统一设置三种调试线条(骨骼/插槽/网格)的宽度, UI 滑块用。
+*/
+void SpineWidget::setDebugLineWidth(qreal width)
+{
+    d->debugBonesWidth = width;
+    d->debugSlotsWidth = width;
+    d->debugMeshWidth = width;
+    emit debugStyleChanged();
+    update();
+}
+
+/*!
+    \property SpineWidget::debugBonesColor
+    \since Visindigo 0.16.2
+    骨骼调试线颜色(默认 QColor(200,150,40,255))。
+*/
+QColor SpineWidget::debugBonesColor() const { return d->debugBonesColor; }
+void SpineWidget::setDebugBonesColor(const QColor& color) { d->debugBonesColor = color; emit debugStyleChanged(); update(); }
+
+/*!
+    \property SpineWidget::debugSlotsColor
+    \since Visindigo 0.16.2
+    插槽调试线颜色(默认 QColor(200,40,150,255))。
+*/
+QColor SpineWidget::debugSlotsColor() const { return d->debugSlotsColor; }
+void SpineWidget::setDebugSlotsColor(const QColor& color) { d->debugSlotsColor = color; emit debugStyleChanged(); update(); }
+
+/*!
+    \property SpineWidget::debugMeshColor
+    \since Visindigo 0.16.2
+    网格调试线颜色(默认 QColor(40,150,200,255))。
+*/
+QColor SpineWidget::debugMeshColor() const { return d->debugMeshColor; }
+void SpineWidget::setDebugMeshColor(const QColor& color) { d->debugMeshColor = color; emit debugStyleChanged(); update(); }
 
 /*!
     \property SpineWidget::backgroundColor

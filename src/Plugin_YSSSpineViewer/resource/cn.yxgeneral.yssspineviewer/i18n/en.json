@@ -1,0 +1,59 @@
+{
+    "animation": {
+        "title": "Animation",
+        "availableTitle": "Select Animation",
+        "trigger": "Trigger",
+        "header": {
+            "once": "Once",
+            "loop": "Loop",
+            "level": "Level",
+            "name": "Animation"
+        }
+    },
+    "skin": {
+        "title": "Skin"
+    },
+    "debug": {
+        "title": "Debug",
+        "bones": "Bones",
+        "slots": "Slots",
+        "mesh": "Mesh",
+        "lineWidth": "Line Width"
+    },
+    "properties": {
+        "title": "Properties",
+        "fps": "FPS",
+        "scale": "Scale",
+        "timeScale": "Time Scale",
+        "scaleX": "Scale X",
+        "scaleY": "Scale Y",
+        "anchorX": "Anchor X",
+        "anchorY": "Anchor Y",
+        "mix": "Mix Duration",
+        "autoFps": "Auto FPS"
+    },
+    "background": {
+        "title": "Background",
+        "black": "Black",
+        "gray": "Gray",
+        "white": "White",
+        "custom": "Custom...",
+        "pickTitle": "Choose Background Color"
+    },
+    "reset": "Reset Pose",
+    "status": {
+        "waiting": "Waiting to load...",
+        "loading": "Loading: %1",
+        "noAtlas": "Atlas file not found: %1",
+        "noSkeleton": "Skeleton file not found: %1",
+        "unsupported": "Unsupported file type: %1",
+        "loadFailed": "Failed to load: please make sure .skel and the same-named .atlas/.png are in place",
+        "loaded": "Animations: %1\nSkins: %2\n%3",
+        "gpuFormat": "%1 / %2",
+        "gpuPending": "(pending)",
+        "fps": "FPS: %1"
+    },
+    "plugin": {
+        "name": "YSS Spine Viewer"
+    }
+}

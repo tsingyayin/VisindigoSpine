@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- YSS Spine Viewer 插件: 仅支持 Release 构建(Visindigo 系列二进制兼容问题, 不提供 Debug 配置);
+       include / lib / dll 路径全部硬连接(不依赖 SolutionDir 变量)。 -->
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{24CF46F2-85FF-4162-BB16-299E3AB51EA5}</ProjectGuid>
+    <Keyword>QtVS_v304</Keyword>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <!-- Qt VS Tools 仅装在 VS2022 hive, 硬连接 QtMsBuild 路径, 避免命令行/IDE 构建时找不到 qt.targets -->
+    <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">C:\Users\tsing\AppData\Local\Microsoft\VisualStudio\17.0_91a615b3\Extensions\qpnovdfk.lyd\QtMSBuild</QtMsBuild>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v145</PlatformToolset>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
+    <Import Project="$(QtMsBuild)\qt_defaults.props" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
+    <!-- 硬连接 Qt 6.10.3 (与 YSS 发布包一致) -->
+    <QtInstall>D:\Qt\6.10.3\msvc2022_64</QtInstall>
+    <QtModules>core;gui;widgets;opengl;openglwidgets</QtModules>
+    <QtBuildConfig>release</QtBuildConfig>
+  </PropertyGroup>
+  <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
+    <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
+  </Target>
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(QtMsBuild)\Qt.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <!-- include 硬连接: YSS 源码(src\Visindigo, src\YSSCore) + VISpineWidget 公共头(Widgets) -->
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);E:\repos\VisindigoProject\YayinStoryStudio\src\Visindigo;E:\repos\VisindigoProject\YayinStoryStudio\src\YSSCore;C:\Users\tsing\Desktop\VisindigoSpine\src\VISpineWidget\Widgets;</IncludePath>
+    <!-- lib 硬连接: YSS 的 Release 输出(Visindigo.lib/YSSCore.lib) + VISpineWidget 的 Release 输出(Visindigo-Widgets-SpineWidget.lib) -->
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);E:\repos\VisindigoProject\YayinStoryStudio\x64\Release;C:\Users\tsing\Desktop\VisindigoSpine\x64\Release;</LibraryPath>
+    <!-- 输出到本方案(VisindigoSpine)的 x64\Release, 绝对路径硬连接: 无论方案编译还是直接编译 .vcxproj 都一致;
+         编译完成后由部署步骤把 .vpl/.vpl.json 复制到 YSS 插件目录 -->
+    <OutDir>C:\Users\tsing\Desktop\VisindigoSpine\x64\Release\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <TargetExt>.vpl</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <LanguageStandard>stdcpp23</LanguageStandard>
+      <PreprocessorDefinitions>_WINDLL;QT_NO_DEPRECATED_WARNINGS;%(PreprocessorDefinitions);YSSSPINEVIEWER_EXPORT</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(QtInstallDir)\include;$(QtInstallDir)\include\QtCore;$(QtInstallDir)\include\QtGui;$(QtInstallDir)\include\QtWidgets;$(QtInstallDir)\include\QtOpenGL;$(QtInstallDir)\include\QtOpenGLWidgets;$(QtInstallDir)\include\QtGui\6.10.3\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);Visindigo.lib;YSSCore.lib;Visindigo-Widgets-SpineWidget.lib;Qt6Core.lib;Qt6Gui.lib;Qt6Widgets.lib;Qt6OpenGL.lib;Qt6OpenGLWidgets.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(QtInstallDir)\lib;E:\repos\VisindigoProject\YayinStoryStudio\x64\Release;C:\Users\tsing\Desktop\VisindigoSpine\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <QtMoc Include="Plugin_YSSSpineViewer.h" />
+    <QtMoc Include="SpineViewer\SpineViewerWidget.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="cpp\Plugin_YSSSpineViewer.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="SpineViewer\SpineViewerFileServer.cpp" />
+    <ClCompile Include="SpineViewer\SpineViewerWidget.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SpineViewer\SpineViewerFileServer.h" />
+    <ClInclude Include="YSSSpineViewerCompileMacro.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="Plugin_YSSSpineViewer.qrc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Plugin_YSSSpineViewer.vpl.json" />
+  </ItemGroup>
+  <ItemDefinitionGroup>
+    <!-- 把插件元数据(.vpl.json)复制到输出目录, 供 Visindigo 插件加载器解析依赖 -->
+    <PostBuildEvent>
+      <Command>copy /Y "$(ProjectDir)Plugin_YSSSpineViewer.vpl.json" "$(OutDir)Plugin_YSSSpineViewer.vpl.json"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
+    <Import Project="$(QtMsBuild)\qt.targets" />
+  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

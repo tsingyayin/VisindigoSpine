@@ -1,0 +1,59 @@
+{
+    "animation": {
+        "title": "動畫",
+        "availableTitle": "選擇動畫",
+        "trigger": "觸發",
+        "header": {
+            "once": "單次",
+            "loop": "循環",
+            "level": "層級",
+            "name": "動畫名"
+        }
+    },
+    "skin": {
+        "title": "皮膚"
+    },
+    "debug": {
+        "title": "除錯",
+        "bones": "骨骼",
+        "slots": "插槽",
+        "mesh": "網格",
+        "lineWidth": "線條寬度"
+    },
+    "properties": {
+        "title": "屬性",
+        "fps": "FPS",
+        "scale": "縮放",
+        "timeScale": "時間倍率",
+        "scaleX": "X 縮放",
+        "scaleY": "Y 縮放",
+        "anchorX": "原點X偏移",
+        "anchorY": "原點Y偏移",
+        "mix": "混合時長",
+        "autoFps": "自適應幀率"
+    },
+    "background": {
+        "title": "背景",
+        "black": "黑色",
+        "gray": "灰色",
+        "white": "白色",
+        "custom": "自訂...",
+        "pickTitle": "選擇背景顏色"
+    },
+    "reset": "重置姿態",
+    "status": {
+        "waiting": "等待載入...",
+        "loading": "載入中: %1",
+        "noAtlas": "找不到圖集檔案: %1",
+        "noSkeleton": "找不到骨骼檔案: %1",
+        "unsupported": "不支援的檔案類型: %1",
+        "loadFailed": "資源載入失敗: 請確認 .skel 與同名 .atlas/.png 已就位",
+        "loaded": "動畫: %1 個\n皮膚: %2 個\n%3",
+        "gpuFormat": "%1 / %2",
+        "gpuPending": "(待初始化)",
+        "fps": "FPS: %1"
+    },
+    "plugin": {
+        "name": "YSS Spine Viewer"
+    }
+}

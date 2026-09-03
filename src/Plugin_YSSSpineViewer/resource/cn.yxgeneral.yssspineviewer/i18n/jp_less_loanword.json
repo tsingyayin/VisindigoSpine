@@ -1,0 +1,59 @@
+{
+    "animation": {
+        "title": "動画",
+        "availableTitle": "動画を選ぶ",
+        "trigger": "再生",
+        "header": {
+            "once": "一回",
+            "loop": "繰り返し",
+            "level": "階層",
+            "name": "動画名"
+        }
+    },
+    "skin": {
+        "title": "外装"
+    },
+    "debug": {
+        "title": "検証",
+        "bones": "骨格",
+        "slots": "部位",
+        "mesh": "網目",
+        "lineWidth": "線幅"
+    },
+    "properties": {
+        "title": "設定項目",
+        "fps": "FPS",
+        "scale": "倍率",
+        "timeScale": "時間倍率",
+        "scaleX": "X倍率",
+        "scaleY": "Y倍率",
+        "anchorX": "原点Xずれ",
+        "anchorY": "原点Yずれ",
+        "mix": "混ぜる時間",
+        "autoFps": "自動FPS"
+    },
+    "background": {
+        "title": "背景",
+        "black": "黒",
+        "gray": "灰色",
+        "white": "白",
+        "custom": "自由設定...",
+        "pickTitle": "背景色を選ぶ"
+    },
+    "reset": "姿勢を初期化",
+    "status": {
+        "waiting": "読み込み待ち...",
+        "loading": "読み込み中: %1",
+        "noAtlas": "図鑑ファイルが見つかりません: %1",
+        "noSkeleton": "骨格ファイルが見つかりません: %1",
+        "unsupported": "対応していないファイル形式: %1",
+        "loadFailed": "読み込みに失敗しました: .skel と同じ名前の .atlas/.png があるか確認してください",
+        "loaded": "動画: %1 個\n外装: %2 個\n%3",
+        "gpuFormat": "%1 / %2",
+        "gpuPending": "(準備中)",
+        "fps": "FPS: %1"
+    },
+    "plugin": {
+        "name": "YSS Spine Viewer"
+    }
+}

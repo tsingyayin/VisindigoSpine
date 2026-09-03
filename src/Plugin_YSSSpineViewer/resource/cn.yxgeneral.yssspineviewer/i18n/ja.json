@@ -1,0 +1,59 @@
+{
+    "animation": {
+        "title": "アニメーション",
+        "availableTitle": "アニメーションを選択",
+        "trigger": "再生",
+        "header": {
+            "once": "単発",
+            "loop": "ループ",
+            "level": "階層",
+            "name": "アニメーション名"
+        }
+    },
+    "skin": {
+        "title": "スキン"
+    },
+    "debug": {
+        "title": "デバッグ",
+        "bones": "ボーン",
+        "slots": "スロット",
+        "mesh": "メッシュ",
+        "lineWidth": "線幅"
+    },
+    "properties": {
+        "title": "プロパティ",
+        "fps": "FPS",
+        "scale": "スケール",
+        "timeScale": "時間倍率",
+        "scaleX": "Xスケール",
+        "scaleY": "Yスケール",
+        "anchorX": "原点Xオフセット",
+        "anchorY": "原点Yオフセット",
+        "mix": "ミックス時間",
+        "autoFps": "自動FPS"
+    },
+    "background": {
+        "title": "背景",
+        "black": "黒",
+        "gray": "グレー",
+        "white": "白",
+        "custom": "カスタム...",
+        "pickTitle": "背景色を選択"
+    },
+    "reset": "ポーズをリセット",
+    "status": {
+        "waiting": "読み込み待機中...",
+        "loading": "読み込み中: %1",
+        "noAtlas": "アトラスファイルが見つかりません: %1",
+        "noSkeleton": "スケルトンファイルが見つかりません: %1",
+        "unsupported": "対応していないファイル形式: %1",
+        "loadFailed": "読み込みに失敗しました: .skel と同名の .atlas/.png を確認してください",
+        "loaded": "アニメーション: %1 個\nスキン: %2 個\n%3",
+        "gpuFormat": "%1 / %2",
+        "gpuPending": "(準備中)",
+        "fps": "FPS: %1"
+    },
+    "plugin": {
+        "name": "YSS Spine Viewer"
+    }
+}

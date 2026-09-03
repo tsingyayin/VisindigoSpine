@@ -1,0 +1,59 @@
+{
+    "animation": {
+        "title": "Анимация",
+        "availableTitle": "Выбрать анимацию",
+        "trigger": "Пуск",
+        "header": {
+            "once": "Один раз",
+            "loop": "Повтор",
+            "level": "Уровень",
+            "name": "Название"
+        }
+    },
+    "skin": {
+        "title": "Скин"
+    },
+    "debug": {
+        "title": "Отладка",
+        "bones": "Кости",
+        "slots": "Слоты",
+        "mesh": "Сетка",
+        "lineWidth": "Ширина линий"
+    },
+    "properties": {
+        "title": "Свойства",
+        "fps": "FPS",
+        "scale": "Масштаб",
+        "timeScale": "Скор. времени",
+        "scaleX": "Масштаб X",
+        "scaleY": "Масштаб Y",
+        "anchorX": "Сдвиг X",
+        "anchorY": "Сдвиг Y",
+        "mix": "Длит. микса",
+        "autoFps": "Авто FPS"
+    },
+    "background": {
+        "title": "Фон",
+        "black": "Чёрный",
+        "gray": "Серый",
+        "white": "Белый",
+        "custom": "Свой...",
+        "pickTitle": "Выбор цвета фона"
+    },
+    "reset": "Сброс позы",
+    "status": {
+        "waiting": "Ожидание загрузки...",
+        "loading": "Загрузка: %1",
+        "noAtlas": "Файл атласа не найден: %1",
+        "noSkeleton": "Файл скелета не найден: %1",
+        "unsupported": "Неподдерживаемый тип файла: %1",
+        "loadFailed": "Не удалось загрузить: убедитесь, что .skel и одноимённый .atlas/.png на месте",
+        "loaded": "Анимаций: %1\nСкинов: %2\n%3",
+        "gpuFormat": "%1 / %2",
+        "gpuPending": "(ожидание)",
+        "fps": "FPS: %1"
+    },
+    "plugin": {
+        "name": "YSS Spine Viewer"
+    }
+}

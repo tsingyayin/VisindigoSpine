@@ -1,0 +1,59 @@
+{
+    "animation": {
+        "title": "Animation",
+        "availableTitle": "Choisir une animation",
+        "trigger": "Jouer",
+        "header": {
+            "once": "Une fois",
+            "loop": "Boucle",
+            "level": "Niveau",
+            "name": "Nom de l'animation"
+        }
+    },
+    "skin": {
+        "title": "Skin"
+    },
+    "debug": {
+        "title": "Débogage",
+        "bones": "Os",
+        "slots": "Emplacements",
+        "mesh": "Maillage",
+        "lineWidth": "Largeur de ligne"
+    },
+    "properties": {
+        "title": "Propriétés",
+        "fps": "FPS",
+        "scale": "Échelle",
+        "timeScale": "Échelle temps",
+        "scaleX": "Échelle X",
+        "scaleY": "Échelle Y",
+        "anchorX": "Ancre X",
+        "anchorY": "Ancre Y",
+        "mix": "Durée du mix",
+        "autoFps": "FPS auto"
+    },
+    "background": {
+        "title": "Arrière-plan",
+        "black": "Noir",
+        "gray": "Gris",
+        "white": "Blanc",
+        "custom": "Personnalisé...",
+        "pickTitle": "Choisir la couleur de fond"
+    },
+    "reset": "Réinitialiser la pose",
+    "status": {
+        "waiting": "En attente de chargement...",
+        "loading": "Chargement : %1",
+        "noAtlas": "Fichier d'atlas introuvable : %1",
+        "noSkeleton": "Fichier de squelette introuvable : %1",
+        "unsupported": "Type de fichier non pris en charge : %1",
+        "loadFailed": "Échec du chargement : vérifiez que .skel et le .atlas/.png du même nom sont en place",
+        "loaded": "Animations : %1\nSkins : %2\n%3",
+        "gpuFormat": "%1 / %2",
+        "gpuPending": "(en attente)",
+        "fps": "FPS : %1"
+    },
+    "plugin": {
+        "name": "YSS Spine Viewer"
+    }
+}

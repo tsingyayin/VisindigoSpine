@@ -6,9 +6,11 @@
 #include <QObject>
 #include <QTimerEvent>
 #include <QImage>
+#include <QOpenGLContext>
 #include <QOpenGLTexture>
 #include <QHash>
 #include <QMutex>
+#include <QPointer>
 #include <spine/spine.h>
 
 namespace Visindigo::Widgets {
@@ -20,10 +22,21 @@ static bool gTextureFreezed = false;
 class Texture {
 public:
     explicit Texture(const QString& name): name(name) {}
-    ~Texture() { if (glTexture) { delete glTexture; glTexture = nullptr; } }
+    ~Texture() {
+        if (glTexture) {
+            // 仅当所属 GL 上下文仍存活时才销毁: QOpenGLWidget 重 parent/重建上下文时,
+            // 旧上下文已销毁、GL 对象已随上下文一并释放, 此时直接 delete 会让
+            // QOpenGLTexturePrivate::destroy() 经悬空上下文指针调用
+            // QOpenGLContext::areSharing 而崩溃, 故只丢弃指针, 交由懒创建重建。
+            if (context)
+                delete glTexture;
+            glTexture = nullptr;
+        }
+    }
     QString name;
     QImage image;
     QOpenGLTexture* glTexture = nullptr;
+    QPointer<QOpenGLContext> context;   // 创建 glTexture 时的上下文(用于安全销毁判定)
 };
 
 class AimyTextureLoader: public spine::TextureLoader {

@@ -1,0 +1,59 @@
+{
+    "animation": {
+        "title": "Animation",
+        "availableTitle": "Animation wählen",
+        "trigger": "Abspielen",
+        "header": {
+            "once": "Einmal",
+            "loop": "Schleife",
+            "level": "Ebene",
+            "name": "Animationsname"
+        }
+    },
+    "skin": {
+        "title": "Skin"
+    },
+    "debug": {
+        "title": "Debug",
+        "bones": "Knochen",
+        "slots": "Slots",
+        "mesh": "Netz",
+        "lineWidth": "Linienbreite"
+    },
+    "properties": {
+        "title": "Eigenschaften",
+        "fps": "FPS",
+        "scale": "Skalierung",
+        "timeScale": "Zeitfaktor",
+        "scaleX": "Skalierung X",
+        "scaleY": "Skalierung Y",
+        "anchorX": "Anker X",
+        "anchorY": "Anker Y",
+        "mix": "Mixdauer",
+        "autoFps": "Auto FPS"
+    },
+    "background": {
+        "title": "Hintergrund",
+        "black": "Schwarz",
+        "gray": "Grau",
+        "white": "Weiß",
+        "custom": "Benutzerdefiniert...",
+        "pickTitle": "Hintergrundfarbe wählen"
+    },
+    "reset": "Pose zurücksetzen",
+    "status": {
+        "waiting": "Warten auf Laden...",
+        "loading": "Lädt: %1",
+        "noAtlas": "Atlasdatei nicht gefunden: %1",
+        "noSkeleton": "Skelettdatei nicht gefunden: %1",
+        "unsupported": "Nicht unterstützter Dateityp: %1",
+        "loadFailed": "Laden fehlgeschlagen: Stellen Sie sicher, dass .skel und gleichnamige .atlas/.png vorhanden sind",
+        "loaded": "Animationen: %1\nSkins: %2\n%3",
+        "gpuFormat": "%1 / %2",
+        "gpuPending": "(wartet)",
+        "fps": "FPS: %1"
+    },
+    "plugin": {
+        "name": "YSS Spine Viewer"
+    }
+}
