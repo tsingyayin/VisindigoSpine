@@ -48,10 +48,12 @@
     <!-- lib 硬连接: YSS 的 Release 输出(Visindigo.lib/YSSCore.lib) + VISpineWidget 的 Release 输出(Visindigo-Widgets-SpineWidget.lib) -->
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);E:\repos\VisindigoProject\YayinStoryStudio\x64\Release;C:\Users\tsing\Desktop\VisindigoSpine\x64\Release;</LibraryPath>
     <!-- 输出到本方案(VisindigoSpine)的 x64\Release, 绝对路径硬连接: 无论方案编译还是直接编译 .vcxproj 都一致;
-         编译完成后由部署步骤把 .vpl/.vpl.json 复制到 YSS 插件目录 -->
+         编译完成后由 DeployToYSS 目标把整个插件负载复制到 YSS 插件目录 -->
     <OutDir>C:\Users\tsing\Desktop\VisindigoSpine\x64\Release\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <TargetExt>.vpl</TargetExt>
+    <!-- YSS 插件部署目录(硬连接, 与 include/lib 路径保持一致的写法) -->
+    <YSSPluginDeployDir>E:\repos\VisindigoProject\YayinStoryStudio\x64\Release\user_data\plugins\YSSSpineViewer</YSSPluginDeployDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -97,6 +99,21 @@
       <Command>copy /Y "$(ProjectDir)Plugin_YSSSpineViewer.vpl.json" "$(OutDir)Plugin_YSSSpineViewer.vpl.json"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <Target Name="DeployToYSS" AfterTargets="Build">
+    <!-- YSS 的插件加载器不会搜索插件自身目录, 因此 .vpl 的私有依赖
+         (Qt6OpenGL/Qt6OpenGLWidgets/SpineWidget) 必须随插件一起部署,
+         并由 .vpl.json 的 DependLibs 在加载 .vpl 之前显式预加载。 -->
+    <ItemGroup>
+      <YSSPluginPayload Include="$(TargetPath)" />
+      <YSSPluginPayload Include="$(OutDir)Plugin_YSSSpineViewer.vpl.json" />
+      <YSSPluginPayload Include="$(OutDir)Visindigo-Widgets-SpineWidget.dll" />
+      <YSSPluginPayload Include="$(QtInstallDir)\bin\Qt6OpenGL.dll" />
+      <YSSPluginPayload Include="$(QtInstallDir)\bin\Qt6OpenGLWidgets.dll" />
+    </ItemGroup>
+    <MakeDir Directories="$(YSSPluginDeployDir)" Condition="!Exists('$(YSSPluginDeployDir)')" />
+    <Copy SourceFiles="@(YSSPluginPayload)" DestinationFolder="$(YSSPluginDeployDir)" SkipUnchangedFiles="false" />
+    <Message Importance="High" Text="部署插件到 $(YSSPluginDeployDir)" />
+  </Target>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
     <Import Project="$(QtMsBuild)\qt.targets" />

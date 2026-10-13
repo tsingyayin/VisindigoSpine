@@ -1336,20 +1336,32 @@ void SpineWidgetPrivate::renderDebug()
     }
 
     if (debugMesh) {
-        spine::Vector<Point> points;
         colorProgram->setUniformValue("u_color", debugMeshColor);
         gl->glLineWidth(static_cast<GLfloat>(debugMeshWidth));
+        spine::Vector<Point> world, lines;
         for (size_t i = 0, n = skeleton->getSlots().size(); i < n; i++) {
             auto slot = skeleton->getSlots()[i];
             if (not slot->getAttachment() || not slot->getAttachment()->getRTTI().isExactly(spine::MeshAttachment::rtti))
                 continue;
             auto* mesh = static_cast<spine::MeshAttachment*>(slot->getAttachment());
-            size_t numVertices = mesh->getWorldVerticesLength() / 2;
-            points.setSize(numVertices, Point());
+            const size_t numVertices = mesh->getWorldVerticesLength() / 2;
+            world.setSize(numVertices, Point());
             mesh->computeWorldVertices(*slot, 0, mesh->getWorldVerticesLength(),
-                                       (float*)points.buffer(), 0, sizeof(Point) / sizeof(float));
-            colorProgram->setAttributeArray("a_position", GL_FLOAT, points.buffer(), 2, sizeof(Point));
-            gl->glDrawArrays(GL_LINE_LOOP, 0, static_cast<GLsizei>(points.size()));
+                                       (float*)world.buffer(), 0, sizeof(Point) / sizeof(float));
+            auto& triangles = mesh->getTriangles();
+            const size_t base = lines.size();
+            lines.setSize(base + (triangles.size() / 3) * 6, Point());
+            size_t k = base;
+            for (size_t t = 0; t + 2 < triangles.size(); t += 3) {
+                for (size_t e = 0; e < 3; e++) {
+                    lines[k++] = world[triangles[t + e]];
+                    lines[k++] = world[triangles[t + (e + 1) % 3]];
+                }
+            }
+        }
+        if (lines.size() > 0) {
+            colorProgram->setAttributeArray("a_position", GL_FLOAT, lines.buffer(), 2, sizeof(Point));
+            gl->glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(lines.size()));
         }
     }
 

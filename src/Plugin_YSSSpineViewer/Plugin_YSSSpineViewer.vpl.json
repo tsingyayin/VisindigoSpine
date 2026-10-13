@@ -1,4 +1,9 @@
 {
 	"ID": "cn.yxgeneral.yssspineviewer",
-	"Dependencies": []
+	"Dependencies": [],
+	"DependLibs": [
+		"Qt6OpenGL.dll",
+		"Qt6OpenGLWidgets.dll",
+		"Visindigo-Widgets-SpineWidget.dll"
+	]
 }

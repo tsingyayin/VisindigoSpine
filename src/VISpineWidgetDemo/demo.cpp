@@ -42,8 +42,8 @@ DemoWindow::DemoWindow(QWidget *parent)
     m_spine = new Visindigo::Widgets::SpineWidget(this);
     m_spine->setMinimumSize(480, 480);
     m_spine->setBackgroundColor(QColor("#000000"));
-    m_spine->setAtlasFile(QStringLiteral("examples/your_spine/your_spine.atlas"));
-    m_spine->setSkeletonFile(QStringLiteral("examples/your_spine/your_spine.skel"));
+    m_spine->setAtlasFile(QStringLiteral("examples/tsingyayin/tsingyayin.atlas"));
+    m_spine->setSkeletonFile(QStringLiteral("examples/tsingyayin/tsingyayin.json"));
     m_spine->setFps(60);
     m_spine->setDefaultMix(0.2);
 
